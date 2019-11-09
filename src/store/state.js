@@ -3,5 +3,10 @@ export default {
   longitude: 116.36867,
   shops: [],
   address: {},
-  categorys: []
+  categorys: [],
+  userInfo: {},
+  goods: [],
+  ratings: [],
+  info: {},
+  cartFoods: []
 }

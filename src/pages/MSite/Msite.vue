@@ -13,16 +13,19 @@
       </span>
     </header> -->
     <HeaderTop :title='address.name'>
-      <span class="header_search" slot="left">
+      <router-link to='/search' class="header_search" slot="left">
         <i class="iconfont icon-sousuo"></i>
-      </span>
-      <span class="header_login" slot="right">
-        <span class="header_login_text">登录|注册</span>
-      </span>
+      </router-link>
+      <router-link class="header_login" slot="right" :to="userInfo._id ? '/userinfo' : '/login'">
+        <span class="header_login_text" v-if="!userInfo._id">登录|注册</span>
+        <span class="header_login_text" v-else>
+          <i class="iconfont icon-person"></i>
+        </span>
+      </router-link>
     </HeaderTop>
     <!--首页导航-->
     <nav class="msite_nav">
-      <div class="swiper-container">
+      <div class="swiper-container" v-if="categorys.length">
         <div class="swiper-wrapper">
           <div class="swiper-slide" v-for="(categorys,index) in categorysArr" :key="index">
             <a href="javascript:" class="link_to_food" v-for="(category,index) in categorys" :key="index">
@@ -36,6 +39,7 @@
         <!-- Add Pagination -->
         <div class="swiper-pagination"></div>
       </div>
+      <img src="./images/msite_back.svg" alt="back" v-else>
     </nav>
     <!--首页附近商家-->
     <div class="msite_shop_list">
@@ -61,7 +65,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['address', 'categorys']),
+    ...mapState(['address', 'categorys', 'userInfo']),
     categorysArr () {
       const {categorys} = this
       const arr = []
@@ -87,6 +91,7 @@ export default {
   },
   mounted () {
     this.$store.dispatch('getCategorys')
+    this.$store.dispatch('getShops')
   },
   watch: {
     categorys (value) {
