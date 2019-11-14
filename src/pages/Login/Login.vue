@@ -82,7 +82,7 @@ export default {
     AlertTip
   },
   methods: {
-    getCode () {
+    async getCode () {
       this.computeTime = 30
       this.sent = true
       this.timer = setInterval(() => {
@@ -92,15 +92,18 @@ export default {
           clearInterval(this.timer)
         }
       }, 1000)
-      reqSendCode(this.phone).then((response) => {
-        if (response.code === 1) {
-          this.alertShow(response.msg)
-          if (this.computeTime) {
-            clearInterval(this.timer)
-            this.timer = 0
-          }
+      // 发送ajax请求(向指定手机号发送验证码短信)
+      const result = await reqSendCode(this.phone)
+      if(result.code===1) {
+        // 显示提示
+        this.showAlert(result.msg)
+        // 停止计时
+        if(this.computeTime) {
+          this.computeTime = 0
+          clearInterval(this.intervalId)
+          this.intervalId = undefined
         }
-      })
+      }
     },
     getCaptcha () {
       this.$refs.captcha.src = 'http://localhost:4000/captcha?' + Date.now()

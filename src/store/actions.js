@@ -9,7 +9,8 @@ import {
   RECEIVE_GOODS,
   INCREMENT_FOOD_COUNT,
   DECREMENT_FOOD_COUNT,
-  CLEAR_CART
+  CLEAR_CART,
+  RECEIVE_SEARCH_SHOPS
 } from './mutation-types'
 import {
   reqAddress,
@@ -19,35 +20,36 @@ import {
   reqLogout,
   reqShopRatings,
   reqShopGoods,
-  reqShopInfo
+  reqShopInfo,
+  reqSearchShop
 } from '../api'
 
 export default {
-  getAddress ({commit, state}) {
+  async getAddress ({commit, state}) {
     const geohash = state.latitude + ',' + state.longitude
-    reqAddress(geohash).then(response => {
-      if (response.code === 0) {
-        const address = response.data
-        commit(RECEIVE_ADDRESS, {address})
-      }
-    })
+    const result = await reqAddress(geohash)
+    // 提交一个mutation
+    if (result.code === 0) {
+      const address = result.data
+      commit(RECEIVE_ADDRESS, {address})
+    }
   },
-  getShops ({commit, state}) {
+  async getShops ({commit, state}) {
     const {latitude, longitude} = state
-    reqShops(latitude, longitude).then(response => {
-      if (response.code === 0) {
-        const shops = response.data
-        commit(RECEIVE_SHOPS, {shops})
-      }
-    })
+    const result = await reqShops(longitude, latitude)
+    // 提交一个mutation
+    if (result.code === 0) {
+      const shops = result.data
+      commit(RECEIVE_SHOPS, {shops})
+    }
   },
-  getCategorys ({commit, state}) {
-    reqFoodCategorys().then(response => {
-      if (response.code === 0) {
-        const categorys = response.data
-        commit(RECEIVE_CATEGORYS, {categorys})
-      }
-    })
+  async getCategorys ({commit, state}) {
+    const result = await reqFoodCategorys()
+    // 提交一个mutation
+    if (result.code === 0) {
+      const categorys = result.data
+      commit(RECEIVE_CATEGORYS, {categorys})
+    }
   },
   recordUser ({commit}, userInfo) {
     commit(RECEIVE_USER_INFO, {userInfo})
@@ -107,5 +109,14 @@ export default {
   // 同步清空购物车
   clearCart ({commit}) {
     commit(CLEAR_CART)
+  },
+
+  async searchShops ({commit, state}, keyword) {
+    const geohash = state.latitude + ',' + state.longitude
+    const result = await reqSearchShop(geohash, keyword)
+    if (result.code === 0) {
+      const searchShops = result.data
+      commit(RECEIVE_SEARCH_SHOPS, {searchShops})
+    }
   }
 }
